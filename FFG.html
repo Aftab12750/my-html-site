@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bytez Text to Video (New API)</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    textarea { width: 90%; height: 100px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 18px; margin-top: 10px; }
+    #output video { width: 90%; max-width: 600px; margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>🎥 Bytez - Text to Video Generator (v2)</h2>
+  <textarea id="prompt" placeholder="Enter your video prompt (e.g. A cat playing with a rose)"></textarea><br>
+  <button onclick="generateVideo()">🎬 Generate Video</button>
+  <div id="output" style="margin-top:20px;"></div>
+
+  <script>
+    async function generateVideo() {
+      const prompt = document.getElementById("prompt").value;
+      const outputDiv = document.getElementById("output");
+      outputDiv.innerHTML = "⏳ Generating video, please wait...";
+
+      try {
+        const res = await fetch("https://api.bytez.com/models/v2/ali-vilab/text-to-video-ms-1.7b", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Key 7358f795ccd9b94ef7f8d3f60dea395a" // আপনার নিজস্ব API key
+          },
+          body: JSON.stringify({ text: prompt })
+        });
+
+        const data = await res.json();
+        if (data?.video_url) {
+          outputDiv.innerHTML = `
+            <p>✅ Video generated successfully!</p>
+            <video src="${data.video_url}" controls autoplay></video>
+            <br><a href="${data.video_url}" target="_blank">🔗 Download Video</a>
+          `;
+        } else {
+          outputDiv.innerHTML = "❌ Failed to generate video. Please try again.";
+        }
+
+      } catch (error) {
+        outputDiv.innerHTML = "❌ Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
